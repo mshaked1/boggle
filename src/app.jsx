@@ -20,19 +20,30 @@ var boxStyle = {
 
 var Board = React.createClass({
   getInitialState: function(){
-    return {value: '-'};
+    return {
+
+      boardObj: {'00': '-', '01': '-', '02': '-', '10': '-', '11': '-', '12': '-', '20': '-', '21': '-', '22': '-' },
+      counter: 0
+    }
   },
-  handleSwitchBox: function(value){
-    this.setState({value: value});
-    console.log(value);
+  
+  handleSwitchBox: function(value, targetRow, targetBox, counter){
+    console.log(targetRow+targetBox);
+    const newState = this.state;
+    newState.boardObj[targetRow+targetBox] = value;
+    newState.counter = counter;
+    this.setState({newState});
+  },
+
+  handleCheckWinner: function(){
+    // set state with winner!
   },
 
   render: function(){
     var board = [];
     for (var rows = 0; rows < 3; rows++){
-      board.push(<Row handleSwitchBox1={this.handleSwitchBox} value={this.state.value} key={rows}/>);
+      board.push(<Row handleSwitchBox1={this.handleSwitchBox} key={rows} rowID={rows} boardProp={this.state.boardObj} counter={this.state.counter}/>);
     }
-    console.log(board);
     return (<div>{board}</div>)
   }
 })
@@ -42,11 +53,10 @@ var Row = React.createClass({
 
   render: function() {
     var ticTacRow = [];
-    for (var i = 0; i < 3; i++) {
-      console.log(this.props.value);
-      ticTacRow.push(<Box handleSwitchBox2={this.props.handleSwitchBox1} value={this.props.value} key={i}/>);
+    for (var box = 0; box < 3; box++) {
+     
+      ticTacRow.push(<Box handleSwitchBox2={this.props.handleSwitchBox1} row={this.props.rowID} key={box} boxID={box} boardProp1={this.props.boardProp} counter={this.props.counter}/>);
     }
-    console.log(ticTacRow);
     return (<div>{ticTacRow}</div>);
     // return (<div>{ this.state }</div>);
   }
@@ -55,14 +65,28 @@ var Row = React.createClass({
 var Box = React.createClass({
 
   switchBox: function(){
-    console.log(this.props.value+"~!!!")
-    if (this.props.value === 'X') this.props.handleSwitchBox2('O');
-    else (this.props.handleSwitchBox2('X'));
+    var targetRow = this.props.row.toString();
+    var targetBox = this.props.boxID.toString();
+    var letter;
+    var counter = this.props.counter;
+    if ( (this.props.boardProp1[targetRow+targetBox] === '-') && (counter === 0) ){
+      letter = 'X';
+      counter++;
+      this.props.handleSwitchBox2(letter, targetRow, targetBox, counter);
+    }
+    else if( (this.props.boardProp1[targetRow+targetBox] === '-') && (counter === 1) ){
+      letter = 'O';
+      counter--;
+      this.props.handleSwitchBox2(letter, targetRow, targetBox, counter);
+    }
+  },
+
+  checkWinner: function(){
+      // logic to determine winner
   },
 
   render: function() {
-    console.log(this.props.value);
-    return (<button onClick={this.switchBox} style={boxStyle}>{this.props.value}</button>);
+    return (<button onClick={this.switchBox} style={boxStyle}>{this.props.boardProp1[this.props.row.toString()+this.props.boxID.toString()]}</button>);
   }
 })
 
