@@ -28,12 +28,24 @@ var Board = React.createClass({
     }
   },
 
-  handleSwitchBox: function(target, letter, turns){
+  handleSwitchBox: function(event){
     const newState = this.state;
+    console.log(newState);
+    var board = this.state.boardObj;
+    var turns = this.state.turns;
+    var letter = this.state.letter;
+    var target = event.target.id;
+    if ( (this.state.boardObj[target] === '-') && (this.state.letter === 'O') ){
+      turns++;
+      letter = 'X';
+    }
+    else if( (this.state.boardObj[target] === '-') && (this.state.letter === 'X') ){
+      turns++;
+      letter = 'O';
+    }
     newState.boardObj[target] = letter;
     newState.letter = letter;
     newState.turns = turns;
-    console.log("newState turns "+newState.turns);
     this.setState({newState});
   },
 
@@ -44,39 +56,54 @@ var Board = React.createClass({
   render: function(){
     var board = [];
     for (var rows = 0; rows < 3; rows++){
-      board.push(<Row handleSwitchBox1={this.handleSwitchBox} key={rows} id={rows} boardProp={this.state.boardObj} letter={this.state.letter} turns={this.state.turns}/>);
+      board.push(<Row
+        handleSwitchBox={this.handleSwitchBox}
+        key={rows}
+        id={rows}
+        boardProp={this.state.boardObj}/>)
     }
-    return (<div>{board}</div>)
+    return (<div>{board}</div>);
   },
 
-  componentDidUpdate: function(){
+  componentWillUpdate: function(){
+    const win = false;
     const boardSpot = this.state.boardObj;
     const totalTurns = this.state.turns;
-    console.log(totalTurns);
-    if( (totalTurns > 3) && (  (boardSpot['00'] === boardSpot['10']) && (boardSpot['00'] === boardSpot['20'])))   {
+    console.log("turns "+totalTurns);
+    console.log("board "+boardSpot["10"]+boardSpot["00"]+boardSpot["20"]);
+    if(totalTurns > 4 && boardSpot['00'] === boardSpot['10'] ){
+      this.win = true;
       alert(this.state.letter+" wins!");
     }
-    if( (totalTurns > 3) && ( (boardSpot['00'] === boardSpot['01']) && (boardSpot['00'] === boardSpot['02']) )){
+    if(totalTurns > 4 && boardSpot['00'] === boardSpot['01'] && boardSpot['00'] === boardSpot['02']){
+      this.win = true;
       alert(this.state.letter+" wins!");
     }
-    if( (totalTurns > 3) && (  (boardSpot['00'] === boardSpot['11']) && (boardSpot['00'] === boardSpot['22'])) ){
+    if(totalTurns > 4 && boardSpot['00'] === boardSpot['11'] && boardSpot['00'] === boardSpot['22']){
+      this.win = true;
       alert(this.state.letter+" wins!");
     }
-    if( (totalTurns > 3) && (  (boardSpot['10'] === boardSpot['11']) && (boardSpot['11'] === boardSpot['12'])) ){
+    if(totalTurns > 4 && boardSpot['10'] === boardSpot['11'] && boardSpot['11'] === boardSpot['12']){
+      this.win = true;
       alert(this.state.letter+" wins!");
     }
-    if( (totalTurns > 3) && (  (boardSpot['20'] === boardSpot['21']) && (boardSpot['20'] === boardSpot['22'])) ){
+    if(totalTurns > 4 && boardSpot['20'] === boardSpot['21'] && boardSpot['20'] === boardSpot['22']){
+      this.win = true;
       alert(this.state.letter+" wins!");
     }
-    if( (totalTurns > 3) && (  (boardSpot['20'] === boardSpot['11']) && (boardSpot['20'] === boardSpot['02'])) ){
+    if(totalTurns > 4 && boardSpot['20'] === boardSpot['11'] && boardSpot['20'] === boardSpot['02']){
+      this.win = true;
       alert(this.state.letter+" wins!");
     }
-    if( (totalTurns > 3) && (  (boardSpot['01'] === boardSpot['11']) && (boardSpot['01'] === boardSpot['21'])) ){
+    if(totalTurns > 4 && boardSpot['01'] === boardSpot['11'] && boardSpot['01'] === boardSpot['21']){
+      this.win = true;
       alert(this.state.letter+" wins!");
     }
-    if( (totalTurns > 3) && (  (boardSpot['02'] === boardSpot['12']) && (boardSpot['02'] === boardSpot['22']))) {
+    if(totalTurns > 4 && boardSpot['02'] === boardSpot['12'] && boardSpot['02'] === boardSpot['22']){
+      this.win = true;
       alert(this.state.letter+" wins!");
     }
+    if(this.win) this.getInitialState();
   }
 })
 
@@ -85,40 +112,23 @@ var Row = React.createClass({
   render: function() {
     var ticTacRow = [];
     for (var box = 0; box < 3; box++) {
-     
-      ticTacRow.push(<Box handleSwitchBox2={this.props.handleSwitchBox1} id={this.props.id.toString() + box} key={box} boardProp1={this.props.boardProp} letter={this.props.letter} turns={this.props.turns}/>);
+      ticTacRow.push(<Box
+        handleSwitchBox={this.props.handleSwitchBox}
+        id={this.props.id.toString() + box}
+        key={box}
+        boardProp={this.props.boardProp}/>);
     }
-    
     return (<div>{ticTacRow}</div>);
-    // return (<div>{ this.state }</div>);
   }
 })
 
 var Box = React.createClass({
 
-  switchBox: function(){
-    var turns = this.props.turns;
-    var target = this.props.id.toString();
-    var letter = this.props.letter;
-    if ( (this.props.boardProp1[target] === '-') && (letter === 'O') ){
-      turns++;
-      console.log("turns "+turns);
-      letter = 'X';
-      this.props.handleSwitchBox2(target, letter, turns);
-    }
-    else if( (this.props.boardProp1[target] === '-') && (letter === 'X') ){
-      turns++;
-      letter = 'O';
-      this.props.handleSwitchBox2(target, letter, turns);
-    }
-  },
-
-  checkWinner: function(){
-      // logic to determine winner
-  },
-
   render: function() {
-    return (<button style={'color: green'} onClick={this.switchBox} style={boxStyle}>{this.props.boardProp1[this.props.id.toString()]}</button>);
+    return (<button
+      id={this.props.id}
+      onClick={this.props.handleSwitchBox}
+      style={boxStyle}>{this.props.boardProp[this.props.id.toString()]}</button>);
   }
 })
 
