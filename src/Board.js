@@ -15,7 +15,10 @@ export default class Board extends Component{
     this.clearClicks = this.clearClicks.bind(this);
     this.clearClicks();
     this.submit = this.submit.bind(this);
+    this.allowedClicks = [];
+    this.goodClicks = this.goodClicks.bind(this);
     this.state = {
+      trail: [],
       board: this.boardSpots,
       score: 0,
       playedWords: [],
@@ -55,15 +58,57 @@ export default class Board extends Component{
     })
   }
 
-  // highlights clicked letter, adds to current word
+  goodClicks(id){
+    this.allowedClicks = [];
+    let up = id - 5;
+    let down = id + 5;
+    let left = id - 1;
+    let right = id + 1;
+    if(id % 5 === 1){
+      this.allowedClicks.push(up,down,right);
+      console.log(this.allowedClicks);
+    }
+    else if (id % 5 === 0){
+      this.allowedClicks.push(up, down, left);
+      console.log(this.allowedClicks);
+    }
+    else if (id > 1 && id < 5){
+      this.allowedClicks.push(left, right , down);
+      console.log(this.allowedClicks);
+    }
+    else if (id > 21 && id < 25 ){
+      this.allowedClicks.push(left, right, up);
+      console.log(this.allowedClicks);
+    }
+    else{
+      this.allowedClicks.push(up, down, left, right);
+      console.log(this.allowedClicks);
+    }
+    return this.allowedClicks;
+  }
+
+  // highlights clicked letter, adds to current word, tracks trail
   handleLetterClick(event){
     const target = event.target;
+    const id = parseInt(target.id);
+    let trail = this.state.trail;
     const newLetter = target.value;
     let currentWord = this.state.currentWord;
-    currentWord += newLetter;
     const clicked = this.state.clicked;
-    clicked[target.id] = 'isClicked';
+    if(id === trail[trail.length-1]){
+      clicked[target.id] = 'box';
+      trail.pop();
+      currentWord = currentWord.slice(0,-1);
+    }
+    else if ( trail.length === 0 || (trail.indexOf(id) === -1  && this.allowedClicks.indexOf(id) > -1) ){
+      currentWord += newLetter;
+      trail.push(id);
+      clicked[id] = 'isClicked';
+      this.goodClicks(prevClick||id);
+      let prevClick = id;
+    }
     this.setState({
+      trail: trail,
       currentWord: currentWord,
       clicked: clicked
     });

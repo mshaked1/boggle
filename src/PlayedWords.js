@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 const PlayedWords = (props) => {
 	var words = [];
 	props.playedWords.forEach(function(word){
-		words.push(<span>{word} </span>)
+		words.push(<span key={word}>{word} </span>)
 	});
 	return(
 		<div>
