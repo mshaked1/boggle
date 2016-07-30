@@ -1,7 +1,45 @@
 body {
-  margin: 0;
 }
 
-.container {
+h1{
+}
+
+.content {
   padding: 0 2.5%;
+}
+
+.board{
+	text-align:center;
+	width:1200px;
+	margin-left: auto;
+}
+
+.button{
+	height: 30px;
+	width: 200px;
+	font-size: 18px;
+	text-align: center;
+	margin-bottom: 10px;
+}
+.box{
+    color: red;
+    height: 60px;
+    width: 60px;
+    font-size: 45px;	
+}
+
+.isClicked{
+	color: red;
+    height: 60px;
+    width: 60px;
+    font-size: 45px;	
+    background-color:blue;
+}
+
+.word{
+	font-size: 16px;
+}
+
+.playedWords{
+	text-align:center;
 }

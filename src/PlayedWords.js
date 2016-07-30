@@ -1,0 +1,18 @@
+import React, { Component } from 'react';
+
+const PlayedWords = (props) => {
+	var words = [];
+	props.playedWords.forEach(function(word){
+		words.push(<span>{word} </span>)
+	});
+	return(
+		<div>
+			<h2>Current Word: <span className='word'>{props.currentWord}</span></h2>
+			<h2>Played Words</h2>
+			<div className='playedWords'>{words}</div>
+			<h2>Score: {props.score}</h2>
+		</div>
+	)
+}
+
+module.exports = PlayedWords;
