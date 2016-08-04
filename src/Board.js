@@ -21,6 +21,8 @@ export default class Board extends Component{
       trail: [],
       board: this.boardSpots,
       score: 0,
+      lastScore: 0,
+      lastWord: '',
       playedWords: [],
       currentWord: '',
       clicked: this.clicked
@@ -52,9 +54,12 @@ export default class Board extends Component{
     this.clearClicks();
     this.setState({board: this.boardSpots,
       score: 0,
+      lastScore: 0,
+      lastWord: '',
       playedWords: [],
       currentWord: '',
-      clicked: this.clicked
+      clicked: this.clicked,
+      trail: []
     })
   }
 
@@ -64,26 +69,15 @@ export default class Board extends Component{
     let down = id + 5;
     let left = id - 1;
     let right = id + 1;
-    if(id % 5 === 1){
-      this.allowedClicks.push(up,down,right);
-      console.log(this.allowedClicks);
-    }
-    else if (id % 5 === 0){
-      this.allowedClicks.push(up, down, left);
-      console.log(this.allowedClicks);
-    }
-    else if (id > 1 && id < 5){
-      this.allowedClicks.push(left, right , down);
-      console.log(this.allowedClicks);
-    }
-    else if (id > 21 && id < 25 ){
-      this.allowedClicks.push(left, right, up);
-      console.log(this.allowedClicks);
-    }
-    else{
-      this.allowedClicks.push(up, down, left, right);
-      console.log(this.allowedClicks);
-    }
+    let upLeft = id - 6;
+    let upRight = id - 4;
+    let downLeft = id + 4;
+    let downRight = id + 6;
+    if(id % 5 === 1) this.allowedClicks.push(up,down,right, upRight, downRight);
+    else if (id % 5 === 0) this.allowedClicks.push(up, down, left, upLeft, downLeft);
+    else if (id > 1 && id < 5) this.allowedClicks.push(left, right , down, downLeft, downRight);
+    else if (id > 21 && id < 25 ) this.allowedClicks.push(left, right, up, upLeft, upRight);
+    else this.allowedClicks.push(up, down, left, right, upLeft, upRight, downLeft, downRight);
     return this.allowedClicks;
   }
 
@@ -95,11 +89,16 @@ export default class Board extends Component{
     const newLetter = target.value;
     let currentWord = this.state.currentWord;
     const clicked = this.state.clicked;
+
+    // player clicks on last clicked letter to backtrack
     if(id === trail[trail.length-1]){
       clicked[target.id] = 'box';
       trail.pop();
       currentWord = currentWord.slice(0,-1);
+      this.goodClicks(trail[trail.length - 1]);
+      let prevClick = trail[trail.length - 2];
     }
+    // player clicks on fresh board or adjacent and empty square
     else if ( trail.length === 0 || (trail.indexOf(id) === -1  && this.allowedClicks.indexOf(id) > -1) ){
       currentWord += newLetter;
       trail.push(id);
@@ -109,51 +108,64 @@ export default class Board extends Component{
     }
     this.setState({
       trail: trail,
-      currentWord: currentWord,
+      currentWord: currentWord.toUpperCase(),
       clicked: clicked
     });
   }
 
-  // adds score based on word length, adds submitted word to played words bank, clears board of blue squares
+  // checks if word has already been played, adds score based on word length, adds submitted word to played words bank, clears board of blue squares
   submit(){
-    let playedWords = this.state.playedWords;
-    playedWords.push(this.state.currentWord);
+    let lastWord = 'Already played';
     let score = this.state.score;
-    const length = this.state.currentWord.length;
-    console.log(length);
-    switch(length) {
-      case 0:
-      case 1:
-      case 2:
-        break;
-      case 3:
-      case 4:
-        score += 1;
-        break;
-      case 5:
-        score += 2;
-        break;
-      case 6:
-        score += 3;
-        break;
-      case 7:
-        score += 5;
-        break;
-      default:
-        score += 11;
-        break;
+    let playedWords = this.state.playedWords;
+    let lastScore = 0;
+    if(playedWords.indexOf(this.state.currentWord) === -1){
+      lastWord = this.state.currentWord;
+      playedWords.push(this.state.currentWord);
+      const length = this.state.currentWord.length;
+      switch(length) {
+        case 0:
+        case 1:
+        case 2:
+          break;
+        case 3:
+        case 4:
+          lastScore = 1;
+          score += 1;
+          break;
+        case 5:
+          lastScore = 2;
+          score += 2;
+          break;
+        case 6:
+          lastScore = 3;
+          score += 3;
+          break;
+        case 7:
+          lastScore = 5;
+          score += 5;
+          break;
+        default:
+          lastScore = 11;
+          score += 11;
+          break;
+      }
     }
-    let currentWord = '';
     this.clicked = [];
     let that = this;
     this.dice.forEach(function(item){
       that.clicked.push('box');
     });
+    let trail = [];
+    console.log(lastWord);
     this.setState({
-      currentWord: currentWord,
+      currentWord: '',
+      lastWord: lastWord.toUpperCase(),
+      lastScore: lastScore,
       score: score,
       playedWords: playedWords,
-      clicked: this.clicked
+      clicked: this.clicked,
+      trail: trail
     })
   }
 
@@ -174,6 +186,8 @@ export default class Board extends Component{
         playedWords={this.state.playedWords}
         score={this.state.score}
         currentWord={this.state.currentWord}
+        lastWord={this.state.lastWord}
+        lastScore={this.state.lastScore}
       />)
     }
 

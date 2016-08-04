@@ -11,6 +11,7 @@ const PlayedWords = (props) => {
 			<h2>Played Words</h2>
 			<div className='playedWords'>{words}</div>
 			<h2>Score: {props.score}</h2>
+			<h2>Last Word: <span className='word'>{props.lastWord} - {props.lastScore}</span></h2>
 		</div>
 	)
 }
